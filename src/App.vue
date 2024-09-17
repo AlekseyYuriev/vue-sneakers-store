@@ -5,8 +5,8 @@
     <AppHeader />
 
     <div class="p-10">
-      <div class="flex justify-between items-center">
-        <h2 class="text-3xl font-bold mb-8">Все кроссовки</h2>
+      <div class="flex justify-between items-center mb-8">
+        <h2 class="text-3xl font-bold">Все кроссовки</h2>
 
         <div class="flex gap-4">
           <select class="py-2 px-3 border rounded-md outline-none">
@@ -26,15 +26,30 @@
         </div>
       </div>
 
-      <AppCardList />
+      <AppCardList :sneakers="sneakers" />
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
+import { onMounted, ref } from "vue"
+import axios from "axios"
 import AppHeader from "@/components/AppHeader.vue"
 import AppCardList from "@/components/AppCardList.vue"
 import AppDrawer from "@/components/AppDrawer.vue"
+import type { ISneaker } from "./types/sneaker"
+
+const sneakers = ref<ISneaker[]>([])
+
+onMounted(async () => {
+  try {
+    const { data } = await axios.get("https://94b7cd2ddefb8133.mokky.dev/items")
+
+    sneakers.value = data
+  } catch (error) {
+    console.log(error)
+  }
+})
 </script>
 
 <style scoped></style>

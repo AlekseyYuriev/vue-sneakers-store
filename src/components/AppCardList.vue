@@ -1,17 +1,22 @@
 <template>
   <div class="grid grid-cols-4 gap-5">
     <AppCard
-      title="Мужские Кроссовки Nike Blazer Mid Suede"
-      image-url="/sneakers/sneakers-1.jpg"
-      :price="14.99"
-      :is-added="false"
-      :is-favorite="false"
+      v-for="item in sneakers"
+      :key="item.id"
+      :title="item.title"
+      :image-url="item.imageUrl"
+      :price="item.price"
     />
   </div>
 </template>
 
 <script setup lang="ts">
 import AppCard from "@/components/AppCard.vue"
+import type { ISneaker } from "@/types/sneaker"
+
+const props = defineProps<{
+  sneakers: ISneaker[]
+}>()
 </script>
 
 <style scoped></style>
