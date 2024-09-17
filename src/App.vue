@@ -1,4 +1,5 @@
 <template>
+  <AppDrawer />
   <div class="bg-white w-4/5 m-auto rounded-xl shadow-xl mt-14">
     <AppHeader />
 
@@ -13,6 +14,7 @@
 <script setup lang="ts">
 import AppHeader from "@/components/AppHeader.vue"
 import AppCardList from "@/components/AppCardList.vue"
+import AppDrawer from "@/components/AppDrawer.vue"
 </script>
 
 <style scoped></style>

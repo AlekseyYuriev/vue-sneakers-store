@@ -1,17 +1,19 @@
 <template>
-  <div class="grid grid-cols-4 gap-5">
-    <AppCard
+  <div class="flex flex-col flex-1 gap-4">
+    <CartItem
       title="Мужские Кроссовки Nike Blazer Mid Suede"
       image-url="/sneakers/sneakers-1.jpg"
       :price="14.99"
       :is-added="false"
       :is-favorite="false"
     />
+    <CartItem />
+    <CartItem />
   </div>
 </template>
 
 <script setup lang="ts">
-import AppCard from "@/components/AppCard.vue"
+import CartItem from "@/components/CartItem.vue"
 </script>
 
 <style scoped></style>
