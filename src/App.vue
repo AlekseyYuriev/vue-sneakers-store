@@ -37,8 +37,9 @@
 
       <AppCardList
         :sneakers="sneakers"
-        @handle-favorite="handleFavorite"
         :isLoading="isLoading"
+        @handle-favorite="handleFavorite"
+        @handle-cart="handleCart"
       />
     </div>
   </div>
@@ -61,8 +62,9 @@ import { useScrollbarWidth } from "./store/scrollbarWidth"
 const { scrollbarWidth } = storeToRefs(useScrollbarWidth())
 
 const sneakers = ref<IFullSneaker[]>([])
-const isLoading = ref(false)
+const cart = ref<IFullSneaker[]>([])
 const isDrawerOpen = ref(false)
+const isLoading = ref(false)
 
 const filters = reactive<IFilter>({
   sortBy: "title",
@@ -153,6 +155,17 @@ const handleFavorite = async (id: number) => {
     console.log(error)
   } finally {
     isLoading.value = false
+  }
+}
+
+const handleCart = (sneakerForCart: IFullSneaker) => {
+  const isSneakerAddedToCart = cart.value.find(
+    (item) => item.id === sneakerForCart.id
+  )
+  if (isSneakerAddedToCart) {
+    cart.value.splice(cart.value.indexOf(isSneakerAddedToCart), 1)
+  } else {
+    cart.value.push(sneakerForCart)
   }
 }
 

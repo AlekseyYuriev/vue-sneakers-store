@@ -20,7 +20,7 @@
         </div>
 
         <img
-          @click="addToCart"
+          @click="handleCart"
           :src="isAdded ? '/checked.svg' : '/plus.svg'"
           alt="Plus"
         />
@@ -42,11 +42,15 @@ const props = defineProps<{
 
 const emit = defineEmits({
   handleFavorite: null,
-  addToCart: null,
+  handleCart: null,
 })
 
 const handleFavorite = () => {
   emit("handleFavorite", props.id)
+}
+
+const handleCart = () => {
+  emit("handleCart")
 }
 </script>
 

@@ -11,6 +11,7 @@
       :is-added="item.isAdded"
       :isLoading="isLoading"
       @handle-favorite="handleFavorite"
+      @handle-cart="handleCart(item)"
     />
   </div>
 </template>
@@ -18,7 +19,6 @@
 <script setup lang="ts">
 import AppCard from "@/components/AppCard.vue"
 import type { IFullSneaker } from "@/types/sneaker"
-import { idText } from "typescript"
 
 defineProps<{
   sneakers: IFullSneaker[]
@@ -27,9 +27,14 @@ defineProps<{
 
 const emit = defineEmits({
   handleFavorite: null,
+  handleCart: null,
 })
 
 const handleFavorite = (id: number) => {
   emit("handleFavorite", id)
+}
+
+const handleCart = (sneakerForCart: IFullSneaker) => {
+  emit("handleCart", sneakerForCart)
 }
 </script>
