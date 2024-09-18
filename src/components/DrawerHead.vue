@@ -1,6 +1,7 @@
 <template>
   <div class="flex items-center gap-5 mb-8">
     <svg
+      @click="closeDrawer"
       class="opacity-30 cursor-pointer rotate-180 hover:opacity-100 transition hover:-translate-x-1"
       width="16"
       height="14"
@@ -28,6 +29,28 @@
   </div>
 </template>
 
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import { onMounted, onUnmounted } from "vue"
 
-<style scoped></style>
+const emit = defineEmits({
+  closeDrawer: null,
+})
+
+const closeDrawer = () => {
+  emit("closeDrawer")
+}
+
+function hideDrawerOnButton(evt: KeyboardEvent) {
+  if (evt.key === "Escape") {
+    closeDrawer()
+  }
+}
+
+onMounted(() => {
+  document.addEventListener("keyup", hideDrawerOnButton)
+})
+
+onUnmounted(() => {
+  document.removeEventListener("keyup", hideDrawerOnButton)
+})
+</script>

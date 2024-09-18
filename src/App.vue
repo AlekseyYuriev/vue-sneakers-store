@@ -1,8 +1,8 @@
 <template>
-  <!-- <AppDrawer /> -->
+  <AppDrawer v-if="isDrawerOpen" @close-drawer="closeDrawer" />
 
   <div class="bg-white w-4/5 m-auto rounded-xl shadow-xl mt-14">
-    <AppHeader />
+    <AppHeader @open-drawer="openDrawer" />
 
     <div class="p-10">
       <div class="flex justify-between items-center mb-8">
@@ -33,7 +33,7 @@
 
       <AppCardList
         :sneakers="sneakers"
-        @add-to-favorite="addToFavorite"
+        @handle-favorite="handleFavorite"
         :isLoading="isLoading"
       />
     </div>
@@ -53,6 +53,7 @@ import type { IFavoriteSneaker } from "./types/favorites"
 
 const sneakers = ref<IFullSneaker[]>([])
 const isLoading = ref(false)
+const isDrawerOpen = ref(false)
 
 const filters = reactive<IFilter>({
   sortBy: "title",
@@ -103,13 +104,14 @@ const fetchItems = async () => {
       ...item,
       isFavorite: false,
       isAdded: false,
+      favoriteId: null,
     }))
   } catch (error) {
     console.log(error)
   }
 }
 
-const addToFavorite = async (id: number) => {
+const handleFavorite = async (id: number) => {
   isLoading.value = true
   const likedSneaker = sneakers.value.find(
     (item: IFullSneaker) => item.id === id
@@ -123,6 +125,7 @@ const addToFavorite = async (id: number) => {
         `https://94b7cd2ddefb8133.mokky.dev/favorites/${likedSneaker.favoriteId}`
       )
 
+      likedSneaker.favoriteId = null
       likedSneaker.isFavorite = false
     } else {
       const obj = {
@@ -142,6 +145,14 @@ const addToFavorite = async (id: number) => {
   } finally {
     isLoading.value = false
   }
+}
+
+const openDrawer = () => {
+  isDrawerOpen.value = true
+}
+
+const closeDrawer = () => {
+  isDrawerOpen.value = false
 }
 
 onMounted(async () => {

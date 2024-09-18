@@ -10,7 +10,7 @@
       :is-favorite="item.isFavorite"
       :is-added="item.isAdded"
       :isLoading="isLoading"
-      @add-to-favorite="addToFavorite"
+      @handle-favorite="handleFavorite"
     />
   </div>
 </template>
@@ -26,10 +26,10 @@ defineProps<{
 }>()
 
 const emit = defineEmits({
-  addToFavorite: null,
+  handleFavorite: null,
 })
 
-const addToFavorite = (id: number) => {
-  emit("addToFavorite", id)
+const handleFavorite = (id: number) => {
+  emit("handleFavorite", id)
 }
 </script>

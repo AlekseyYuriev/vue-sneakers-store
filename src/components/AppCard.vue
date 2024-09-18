@@ -4,7 +4,7 @@
       class="relative flex flex-col w-full border border-slate-100 rounded-xl p-8 cursor-pointer transition hover:shadow-xl hover:transform hover:-translate-y-2"
     >
       <button
-        @click="addToFavorite"
+        @click="handleFavorite"
         class="absolute top-8 left-8 disabled:cursor-wait"
         :disabled="isLoading"
       >
@@ -41,12 +41,12 @@ const props = defineProps<{
 }>()
 
 const emit = defineEmits({
-  addToFavorite: null,
+  handleFavorite: null,
   addToCart: null,
 })
 
-const addToFavorite = () => {
-  emit("addToFavorite", props.id)
+const handleFavorite = () => {
+  emit("handleFavorite", props.id)
 }
 </script>
 

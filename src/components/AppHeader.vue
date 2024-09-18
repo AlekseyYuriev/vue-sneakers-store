@@ -10,6 +10,7 @@
 
     <ul class="flex items-center gap-10">
       <li
+        @click="openDrawer"
         class="flex items-center cursor-pointer gap-3 text-gray-500 hover:text-black"
       >
         <img src="/cart.svg" alt="Cart" />
@@ -33,6 +34,14 @@
   </header>
 </template>
 
-<script setup lang="ts"></script>
+<script setup lang="ts">
+const emit = defineEmits({
+  openDrawer: null,
+})
+
+const openDrawer = () => {
+  emit("openDrawer")
+}
+</script>
 
 <style scoped></style>
