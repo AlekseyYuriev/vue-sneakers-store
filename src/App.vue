@@ -1,7 +1,11 @@
 <template>
   <AppDrawer v-if="isDrawerOpen" @close-drawer="closeDrawer" />
 
-  <div class="bg-white w-4/5 m-auto rounded-xl shadow-xl mt-14">
+  <div
+    class="bg-white w-4/5 m-auto rounded-xl shadow-xl mt-14"
+    id="main"
+    :style="{ paddingRight: scrollbarWidth }"
+  >
     <AppHeader @open-drawer="openDrawer" />
 
     <div class="p-10">
@@ -50,6 +54,11 @@ import type { IFullSneaker, ISneaker } from "./types/sneaker"
 import type { IFilter } from "./types/filters"
 import type { IParams } from "./types/params"
 import type { IFavoriteSneaker } from "./types/favorites"
+import handleScrollPadding from "./utils/handleScrollPadding"
+import { storeToRefs } from "pinia"
+import { useScrollbarWidth } from "./store/scrollbarWidth"
+
+const { scrollbarWidth } = storeToRefs(useScrollbarWidth())
 
 const sneakers = ref<IFullSneaker[]>([])
 const isLoading = ref(false)
@@ -163,5 +172,9 @@ onMounted(async () => {
 watch(filters, async () => {
   await fetchItems()
   await fetchFavorites()
+})
+
+watch(isDrawerOpen, (newValue) => {
+  handleScrollPadding(newValue)
 })
 </script>
