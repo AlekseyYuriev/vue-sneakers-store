@@ -13,7 +13,7 @@
         class="flex items-center cursor-pointer gap-3 text-gray-500 hover:text-black"
       >
         <img src="/cart.svg" alt="Cart" />
-        <b>14.99 usd</b>
+        <b>14.99 руб.</b>
       </li>
 
       <li

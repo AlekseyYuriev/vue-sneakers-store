@@ -31,7 +31,11 @@
         </div>
       </div>
 
-      <AppCardList :sneakers="sneakers" />
+      <AppCardList
+        :sneakers="sneakers"
+        @add-to-favorite="addToFavorite"
+        :isLoading="isLoading"
+      />
     </div>
   </div>
 </template>
@@ -42,16 +46,42 @@ import axios from "axios"
 import AppHeader from "@/components/AppHeader.vue"
 import AppCardList from "@/components/AppCardList.vue"
 import AppDrawer from "@/components/AppDrawer.vue"
-import type { ISneaker } from "./types/sneaker"
+import type { IFullSneaker, ISneaker } from "./types/sneaker"
 import type { IFilter } from "./types/filters"
 import type { IParams } from "./types/params"
+import type { IFavoriteSneaker } from "./types/favorites"
 
-const sneakers = ref<ISneaker[]>([])
+const sneakers = ref<IFullSneaker[]>([])
+const isLoading = ref(false)
 
 const filters = reactive<IFilter>({
   sortBy: "title",
   searchQuery: "",
 })
+
+const fetchFavorites = async () => {
+  try {
+    const { data: favorites } = await axios.get(
+      "https://94b7cd2ddefb8133.mokky.dev/favorites"
+    )
+
+    sneakers.value = sneakers.value.map((item: IFullSneaker) => {
+      const favorite = favorites.find(
+        (favorite: IFavoriteSneaker) => favorite.parentId === item.id
+      )
+
+      if (!favorite) {
+        return item
+      }
+
+      item.isFavorite = true
+      item.favoriteId = favorite.id
+      return item
+    })
+  } catch (error) {
+    console.log(error)
+  }
+}
 
 const fetchItems = async () => {
   try {
@@ -69,13 +99,58 @@ const fetchItems = async () => {
       }
     )
 
-    sneakers.value = data
+    sneakers.value = data.map((item: ISneaker) => ({
+      ...item,
+      isFavorite: false,
+      isAdded: false,
+    }))
   } catch (error) {
     console.log(error)
   }
 }
 
-onMounted(fetchItems)
+const addToFavorite = async (id: number) => {
+  isLoading.value = true
+  const likedSneaker = sneakers.value.find(
+    (item: IFullSneaker) => item.id === id
+  )
 
-watch(filters, fetchItems)
+  if (!likedSneaker) return
+
+  try {
+    if (likedSneaker.isFavorite) {
+      await axios.delete(
+        `https://94b7cd2ddefb8133.mokky.dev/favorites/${likedSneaker.favoriteId}`
+      )
+
+      likedSneaker.isFavorite = false
+    } else {
+      const obj = {
+        parentId: id,
+      }
+
+      const { data } = await axios.post(
+        `https://94b7cd2ddefb8133.mokky.dev/favorites`,
+        obj
+      )
+
+      likedSneaker.favoriteId = data.id
+      likedSneaker.isFavorite = true
+    }
+  } catch (error) {
+    console.log(error)
+  } finally {
+    isLoading.value = false
+  }
+}
+
+onMounted(async () => {
+  await fetchItems()
+  await fetchFavorites()
+})
+
+watch(filters, async () => {
+  await fetchItems()
+  await fetchFavorites()
+})
 </script>

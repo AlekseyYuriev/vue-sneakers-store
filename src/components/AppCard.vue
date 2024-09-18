@@ -3,9 +3,13 @@
     <div
       class="relative flex flex-col w-full border border-slate-100 rounded-xl p-8 cursor-pointer transition hover:shadow-xl hover:transform hover:-translate-y-2"
     >
-      <div @click="onClick" class="absolute top-8 left-8">
-        <img :src="isLiked ? '/like-1.svg' : '/like-2.svg'" alt="Favorite" />
-      </div>
+      <button
+        @click="addToFavorite"
+        class="absolute top-8 left-8 disabled:cursor-wait"
+        :disabled="isLoading"
+      >
+        <img :src="isFavorite ? '/like-2.svg' : '/like-1.svg'" alt="Favorite" />
+      </button>
       <img class="w-full" :src="imageUrl" alt="Sneaker" />
       <p class="mt-2 h-12">{{ title }}</p>
 
@@ -16,7 +20,7 @@
         </div>
 
         <img
-          @click="onClickAdd"
+          @click="addToCart"
           :src="isAdded ? '/checked.svg' : '/plus.svg'"
           alt="Plus"
         />
@@ -26,15 +30,24 @@
 </template>
 
 <script setup lang="ts">
-defineProps({
-  title: String,
-  imageUrl: String,
-  price: Number,
-  isFavorite: Boolean,
-  isAdded: Boolean,
-  onClickAdd: Function,
-  onClickFavroite: Function,
+const props = defineProps<{
+  id: number
+  title: string
+  imageUrl: string
+  price: number
+  isFavorite: boolean
+  isAdded: boolean
+  isLoading: boolean
+}>()
+
+const emit = defineEmits({
+  addToFavorite: null,
+  addToCart: null,
 })
+
+const addToFavorite = () => {
+  emit("addToFavorite", props.id)
+}
 </script>
 
 <style scoped></style>

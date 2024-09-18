@@ -3,20 +3,33 @@
     <AppCard
       v-for="item in sneakers"
       :key="item.id"
+      :id="item.id"
       :title="item.title"
       :image-url="item.imageUrl"
       :price="item.price"
+      :is-favorite="item.isFavorite"
+      :is-added="item.isAdded"
+      :isLoading="isLoading"
+      @add-to-favorite="addToFavorite"
     />
   </div>
 </template>
 
 <script setup lang="ts">
 import AppCard from "@/components/AppCard.vue"
-import type { ISneaker } from "@/types/sneaker"
+import type { IFullSneaker } from "@/types/sneaker"
+import { idText } from "typescript"
 
-const props = defineProps<{
-  sneakers: ISneaker[]
+defineProps<{
+  sneakers: IFullSneaker[]
+  isLoading: boolean
 }>()
-</script>
 
-<style scoped></style>
+const emit = defineEmits({
+  addToFavorite: null,
+})
+
+const addToFavorite = (id: number) => {
+  emit("addToFavorite", id)
+}
+</script>
