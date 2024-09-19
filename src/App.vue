@@ -46,6 +46,7 @@
         :isLoading="isLoading"
         @handle-favorite="handleFavorite"
         @handle-cart="handleCart"
+        v-auto-animate
       />
     </div>
   </div>
