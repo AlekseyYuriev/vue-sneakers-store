@@ -1,12 +1,16 @@
 <template>
-  <AppDrawer v-if="isDrawerOpen" @close-drawer="closeDrawer" />
+  <AppDrawer
+    v-if="isDrawerOpen"
+    @close-drawer="closeDrawer"
+    :totalPrice="totalPrice"
+  />
 
   <div
     class="bg-white w-4/5 m-auto rounded-xl shadow-xl mt-14"
     id="main"
     :style="{ paddingRight: scrollbarWidth }"
   >
-    <AppHeader @open-drawer="openDrawer" />
+    <AppHeader @open-drawer="openDrawer" :totalPrice="totalPrice" />
 
     <div class="p-10">
       <div class="flex justify-between items-center mb-8">
@@ -46,18 +50,18 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, reactive, ref, watch } from "vue"
+import { computed, onMounted, provide, reactive, ref, watch } from "vue"
+import { storeToRefs } from "pinia"
 import axios from "axios"
+import { useScrollbarWidth } from "@/store/scrollbarWidth"
+import handleScrollPadding from "@/utils/handleScrollPadding"
 import AppHeader from "@/components/AppHeader.vue"
 import AppCardList from "@/components/AppCardList.vue"
 import AppDrawer from "@/components/AppDrawer.vue"
-import type { IFullSneaker, ISneaker } from "./types/sneaker"
-import type { IFilter } from "./types/filters"
-import type { IParams } from "./types/params"
-import type { IFavoriteSneaker } from "./types/favorites"
-import handleScrollPadding from "./utils/handleScrollPadding"
-import { storeToRefs } from "pinia"
-import { useScrollbarWidth } from "./store/scrollbarWidth"
+import type { IFullSneaker, ISneaker } from "@/types/sneaker"
+import type { IFilter } from "@/types/filters"
+import type { IParams } from "@/types/params"
+import type { IFavoriteSneaker } from "@/types/favorites"
 
 const { scrollbarWidth } = storeToRefs(useScrollbarWidth())
 
@@ -158,15 +162,26 @@ const handleFavorite = async (id: number) => {
   }
 }
 
-const handleCart = (sneakerForCart: IFullSneaker) => {
+const addToCart = (sneakerForCart: IFullSneaker) => {
+  sneakerForCart.isAdded = true
+  cart.value.push(sneakerForCart)
+}
+
+const removeFromCart = (sneakerForCart: IFullSneaker) => {
   const isSneakerAddedToCart = cart.value.find(
     (item) => item.id === sneakerForCart.id
   )
+
   if (isSneakerAddedToCart) {
     cart.value.splice(cart.value.indexOf(isSneakerAddedToCart), 1)
-  } else {
-    cart.value.push(sneakerForCart)
+    sneakerForCart.isAdded = false
   }
+}
+
+const handleCart = (sneakerForCart: IFullSneaker) => {
+  sneakerForCart.isAdded
+    ? removeFromCart(sneakerForCart)
+    : addToCart(sneakerForCart)
 }
 
 const openDrawer = () => {
@@ -176,6 +191,10 @@ const openDrawer = () => {
 const closeDrawer = () => {
   isDrawerOpen.value = false
 }
+
+const totalPrice = computed(() => {
+  return cart.value.reduce((acc, curVal) => acc + curVal.price, 0)
+})
 
 onMounted(async () => {
   await fetchItems()
@@ -190,4 +209,6 @@ watch(filters, async () => {
 watch(isDrawerOpen, (newValue) => {
   handleScrollPadding(newValue)
 })
+
+provide("cart", { cart, removeFromCart })
 </script>

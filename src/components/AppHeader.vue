@@ -14,7 +14,7 @@
         class="flex items-center cursor-pointer gap-3 text-gray-500 hover:text-black"
       >
         <img src="/cart.svg" alt="Cart" />
-        <b>14.99 руб.</b>
+        <b>{{ totalPrice }} руб.</b>
       </li>
 
       <li
@@ -38,6 +38,10 @@
 const emit = defineEmits({
   openDrawer: null,
 })
+
+defineProps<{
+  totalPrice: number
+}>()
 
 const openDrawer = () => {
   emit("openDrawer")

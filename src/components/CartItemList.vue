@@ -1,19 +1,31 @@
 <template>
-  <div class="flex flex-col flex-1 gap-4">
+  <div v-if="cart.length > 0" class="flex flex-col flex-1 gap-4 overflow-auto">
     <CartItem
-      title="Мужские Кроссовки Nike Blazer Mid Suede"
-      image-url="/sneakers/sneakers-1.jpg"
-      :price="14.99"
-      :is-added="false"
-      :is-favorite="false"
+      v-for="item in cart"
+      :key="item.id"
+      :id="item.id"
+      :title="item.title"
+      :image-url="item.imageUrl"
+      :price="item.price"
+      :is-added="item.isAdded"
+      :is-favorite="item.isFavorite"
+      @remove-from-cart="removeFromCart(item)"
     />
-    <CartItem />
-    <CartItem />
+  </div>
+  <div v-else class="flex flex-col flex-1 gap-4">
+    <h2>Ваша корзина пуста</h2>
   </div>
 </template>
 
 <script setup lang="ts">
+import { inject } from "vue"
 import CartItem from "@/components/CartItem.vue"
+import type { IFullSneaker } from "@/types/sneaker"
+
+const { cart, removeFromCart } = inject("cart") as {
+  cart: IFullSneaker[]
+  removeFromCart: Function
+}
 </script>
 
 <style scoped></style>

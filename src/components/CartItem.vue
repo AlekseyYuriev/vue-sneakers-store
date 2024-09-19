@@ -1,13 +1,14 @@
 <template>
   <div class="flex items-center border border-slate-200 p-4 rounded-xl gap-4">
-    <img class="w-16 h-16" src="/sneakers/sneakers-1.jpg" alt="Sneaker" />
+    <img class="w-16 h-16" :src="imageUrl" :alt="title" />
 
-    <div class="flex flex-col justify-between">
-      <p>Кроссовки Nike Air Max 270</p>
+    <div class="flex flex-col justify-between w-full">
+      <p>{{ title }}</p>
 
       <div class="flex justify-between mt-2">
-        <b>14.99 usd</b>
+        <b>{{ price }} руб.</b>
         <img
+          @click="removeFromCart"
           class="opacity-40 hover:opacity-100 cursor-pointer transition"
           src="/close.svg"
           alt="Close"
@@ -18,9 +19,22 @@
 </template>
 
 <script setup lang="ts">
-defineProps({
-  imageUrl: String,
+defineProps<{
+  id: number
+  title: string
+  imageUrl: string
+  price: number
+  isFavorite: boolean
+  isAdded: boolean
+}>()
+
+const emit = defineEmits({
+  removeFromCart: null,
 })
+
+const removeFromCart = () => {
+  emit("removeFromCart")
+}
 </script>
 
 <style scoped></style>

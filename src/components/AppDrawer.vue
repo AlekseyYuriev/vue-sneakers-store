@@ -12,13 +12,13 @@
       <div class="flex gap-2">
         <span>Итого:</span>
         <div class="flex-1 border-b border-dashed"></div>
-        <b>119.99 usd</b>
+        <b>{{ totalPrice }} руб.</b>
       </div>
 
       <div class="flex gap-2">
         <span>Налог 5%:</span>
         <div class="flex-1 border-b border-dashed"></div>
-        <b>5.99 usd</b>
+        <b>{{ taxSum }} руб.</b>
       </div>
     </div>
 
@@ -32,8 +32,13 @@
 </template>
 
 <script setup lang="ts">
+import { computed } from "vue"
 import DrawerHead from "@/components/DrawerHead.vue"
 import CartItemList from "@/components/CartItemList.vue"
+
+const props = defineProps<{
+  totalPrice: number
+}>()
 
 const emit = defineEmits({
   closeDrawer: null,
@@ -42,4 +47,8 @@ const emit = defineEmits({
 const closeDrawer = () => {
   emit("closeDrawer")
 }
+
+const taxSum = computed(() => {
+  return (props.totalPrice * 0.05).toFixed(2)
+})
 </script>
