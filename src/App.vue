@@ -220,12 +220,24 @@ const closeDrawer = () => {
 }
 
 const totalPrice = computed(() => {
-  return cart.value.reduce((acc, curVal) => acc + curVal.price, 0)
+  return cart.value
+    ? cart.value.reduce((acc, curVal) => acc + curVal.price, 0)
+    : 0
 })
 
 onMounted(async () => {
+  const savedCart = localStorage.getItem("cart")
+  cart.value = savedCart ? JSON.parse(savedCart) : []
+
   await fetchItems()
   await fetchFavorites()
+
+  sneakers.value.forEach(
+    (sneaker) =>
+      (sneaker.isAdded = cart.value.some(
+        (cartItem) => cartItem.id === sneaker.id
+      ))
+  )
 })
 
 watch(filters, async () => {
@@ -236,6 +248,14 @@ watch(filters, async () => {
 watch(isDrawerOpen, (newValue) => {
   handleScrollPadding(newValue)
 })
+
+watch(
+  cart,
+  () => {
+    localStorage.setItem("cart", JSON.stringify(cart.value))
+  },
+  { deep: true }
+)
 
 provide("cart", { cart, removeFromCart })
 </script>

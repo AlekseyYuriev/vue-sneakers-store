@@ -6,30 +6,39 @@
   <div class="bg-white w-96 h-full fixed right-0 top-0 z-20 p-8 flex flex-col">
     <DrawerHead @close-drawer="closeDrawer" />
 
-    <CartItemList />
+    <div v-if="totalPrice > 0" class="flex flex-col flex-1">
+      <CartItemList />
 
-    <div class="flex flex-col gap-4 my-7">
-      <div class="flex gap-2">
-        <span>Итого:</span>
-        <div class="flex-1 border-b border-dashed"></div>
-        <b>{{ totalPrice }} руб.</b>
+      <div class="flex flex-col gap-4 my-7">
+        <div class="flex gap-2">
+          <span>Итого:</span>
+          <div class="flex-1 border-b border-dashed"></div>
+          <b>{{ totalPrice }} руб.</b>
+        </div>
+
+        <div class="flex gap-2">
+          <span>Налог 5%:</span>
+          <div class="flex-1 border-b border-dashed"></div>
+          <b>{{ taxSum }} руб.</b>
+        </div>
       </div>
 
-      <div class="flex gap-2">
-        <span>Налог 5%:</span>
-        <div class="flex-1 border-b border-dashed"></div>
-        <b>{{ taxSum }} руб.</b>
-      </div>
+      <button
+        @click="createOrder"
+        :disabled="totalPrice <= 0 || isOrderLoading"
+        class="transition bg-lime-500 w-full rounded-xl py-3 text-white disabled:bg-slate-300 hover:bg-lime-600 active:bg-lime-700 cursor-pointer"
+        :class="{ 'disabled:bg-yellow-300': isOrderLoading }"
+      >
+        {{ orderButtonText }}
+      </button>
     </div>
-
-    <button
-      @click="createOrder"
-      :disabled="totalPrice <= 0 || isOrderLoading"
-      class="transition bg-lime-500 w-full rounded-xl py-3 text-white disabled:bg-slate-300 hover:bg-lime-600 active:bg-lime-700 cursor-pointer"
-      :class="{ 'disabled:bg-yellow-300': isOrderLoading }"
-    >
-      {{ orderButtonText }}
-    </button>
+    <div v-else class="flex h-full items-center">
+      <InfoBlock
+        image-url="/package-icon.png"
+        title="Корзина пуста"
+        description="Добавьте хотя бы одну пару кроссовок, чтобы сделать заказ."
+      />
+    </div>
   </div>
 </template>
 
@@ -37,6 +46,7 @@
 import { computed } from "vue"
 import DrawerHead from "@/components/DrawerHead.vue"
 import CartItemList from "@/components/CartItemList.vue"
+import InfoBlock from "@/components/InfoBlock.vue"
 
 const props = defineProps<{
   totalPrice: number
