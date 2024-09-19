@@ -1,8 +1,10 @@
 <template>
   <AppDrawer
     v-if="isDrawerOpen"
-    @close-drawer="closeDrawer"
     :totalPrice="totalPrice"
+    :isOrderLoading="isOrderLoading"
+    @close-drawer="closeDrawer"
+    @create-order="createOrder"
   />
 
   <div
@@ -69,6 +71,7 @@ const sneakers = ref<IFullSneaker[]>([])
 const cart = ref<IFullSneaker[]>([])
 const isDrawerOpen = ref(false)
 const isLoading = ref(false)
+const isOrderLoading = ref(false)
 
 const filters = reactive<IFilter>({
   sortBy: "title",
@@ -182,6 +185,30 @@ const handleCart = (sneakerForCart: IFullSneaker) => {
   sneakerForCart.isAdded
     ? removeFromCart(sneakerForCart)
     : addToCart(sneakerForCart)
+}
+
+const createOrder = async () => {
+  isOrderLoading.value = true
+  try {
+    const { data } = await axios.post(
+      `https://94b7cd2ddefb8133.mokky.dev/orders`,
+      {
+        items: cart.value,
+        totalPrice: totalPrice.value,
+      }
+    )
+
+    cart.value = []
+    sneakers.value.forEach((sneaker) => {
+      sneaker.isAdded = false
+    })
+
+    return data
+  } catch (error) {
+    console.log(error)
+  } finally {
+    isOrderLoading.value = false
+  }
 }
 
 const openDrawer = () => {

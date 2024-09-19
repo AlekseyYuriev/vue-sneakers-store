@@ -23,10 +23,12 @@
     </div>
 
     <button
-      disabled
+      @click="createOrder"
+      :disabled="totalPrice <= 0 || isOrderLoading"
       class="transition bg-lime-500 w-full rounded-xl py-3 text-white disabled:bg-slate-300 hover:bg-lime-600 active:bg-lime-700 cursor-pointer"
+      :class="{ 'disabled:bg-yellow-300': isOrderLoading }"
     >
-      Оформить заказ
+      {{ orderButtonText }}
     </button>
   </div>
 </template>
@@ -38,17 +40,27 @@ import CartItemList from "@/components/CartItemList.vue"
 
 const props = defineProps<{
   totalPrice: number
+  isOrderLoading: boolean
 }>()
 
 const emit = defineEmits({
   closeDrawer: null,
+  createOrder: null,
 })
 
 const closeDrawer = () => {
   emit("closeDrawer")
 }
 
+const createOrder = () => {
+  emit("createOrder")
+}
+
 const taxSum = computed(() => {
   return (props.totalPrice * 0.05).toFixed(2)
+})
+
+const orderButtonText = computed(() => {
+  return props.isOrderLoading ? "Заказ оформляется..." : "Оформить заказ"
 })
 </script>
