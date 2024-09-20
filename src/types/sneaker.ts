@@ -7,6 +7,6 @@ export interface ISneaker {
 
 export interface IFullSneaker extends ISneaker {
   isFavorite: boolean
-  isAdded: boolean
+  isAdded?: boolean
   favoriteId?: number | null
 }

@@ -75,7 +75,7 @@ const handleFavorite = async (id: number) => {
       likedSneaker.isFavorite = false
     } else {
       const obj = {
-        parentId: id,
+        item_id: id,
       }
 
       const { data } = await axios.post(
@@ -107,7 +107,7 @@ const fetchFavorites = async () => {
 
     sneakers.value = sneakers.value.map((item: IFullSneaker) => {
       const favorite = favorites.find(
-        (favorite: IFavoriteSneaker) => favorite.parentId === item.id
+        (favorite: IFavoriteSneaker) => favorite.item_id === item.id
       )
 
       if (!favorite) {

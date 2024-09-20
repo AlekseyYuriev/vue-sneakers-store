@@ -22,7 +22,7 @@ import type { IFullSneaker } from "@/types/sneaker"
 
 defineProps<{
   sneakers: IFullSneaker[]
-  isLoading: boolean
+  isLoading: boolean | undefined
 }>()
 
 const emit = defineEmits({

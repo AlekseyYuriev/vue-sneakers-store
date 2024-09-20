@@ -20,6 +20,7 @@
         </div>
 
         <img
+          v-if="isAdded !== undefined"
           @click="handleCart"
           :src="isAdded ? '/checked.svg' : '/plus.svg'"
           alt="Plus"
@@ -36,8 +37,8 @@ const props = defineProps<{
   imageUrl: string
   price: number
   isFavorite: boolean
-  isAdded: boolean
-  isLoading: boolean
+  isAdded?: boolean
+  isLoading: boolean | undefined
 }>()
 
 const emit = defineEmits({
