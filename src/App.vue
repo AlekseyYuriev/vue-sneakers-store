@@ -2,9 +2,7 @@
   <AppDrawer
     v-if="isDrawerOpen"
     :totalPrice="totalPrice"
-    :isOrderLoading="isOrderLoading"
     @close-drawer="closeDrawer"
-    @create-order="createOrder"
   />
 
   <div
@@ -23,7 +21,6 @@
 <script setup lang="ts">
 import { computed, provide, ref, watch } from "vue"
 import { storeToRefs } from "pinia"
-import axios from "axios"
 import AppHeader from "@/components/AppHeader.vue"
 import AppDrawer from "@/components/AppDrawer.vue"
 import { useScrollbarWidth } from "@/store/scrollbarWidth"
@@ -34,7 +31,6 @@ const { scrollbarWidth } = storeToRefs(useScrollbarWidth())
 
 const cart = ref<IFullSneaker[]>([])
 const isDrawerOpen = ref(false)
-const isOrderLoading = ref(false)
 
 const addToCart = (sneakerForCart: IFullSneaker) => {
   sneakerForCart.isAdded = true
@@ -49,22 +45,6 @@ const removeFromCart = (sneakerForCart: IFullSneaker) => {
   if (isSneakerAddedToCart) {
     cart.value.splice(cart.value.indexOf(isSneakerAddedToCart), 1)
     sneakerForCart.isAdded = false
-  }
-}
-
-const createOrder = async () => {
-  isOrderLoading.value = true
-  try {
-    await axios.post(`https://94b7cd2ddefb8133.mokky.dev/orders`, {
-      items: cart.value,
-      totalPrice: totalPrice.value,
-    })
-
-    cart.value = []
-  } catch (error) {
-    console.log(error)
-  } finally {
-    isOrderLoading.value = false
   }
 }
 

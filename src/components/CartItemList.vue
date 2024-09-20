@@ -15,12 +15,12 @@
 </template>
 
 <script setup lang="ts">
-import { inject } from "vue"
+import { inject, type Ref } from "vue"
 import CartItem from "@/components/CartItem.vue"
 import type { IFullSneaker } from "@/types/sneaker"
 
 const { cart, removeFromCart } = inject("cart") as {
-  cart: IFullSneaker[]
+  cart: Ref<IFullSneaker[]>
   removeFromCart: Function
 }
 </script>

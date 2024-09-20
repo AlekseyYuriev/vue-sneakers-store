@@ -30,43 +30,79 @@
         @click="createOrder"
         :disabled="totalPrice <= 0 || isOrderLoading"
         class="transition bg-lime-500 w-full rounded-xl py-3 text-white disabled:bg-slate-300 hover:bg-lime-600 active:bg-lime-700 cursor-pointer"
-        :class="{ 'disabled:bg-yellow-300': isOrderLoading }"
+        :class="{
+          'disabled:bg-yellow-300': isOrderLoading,
+          'disabled:cursor-wait': isOrderLoading,
+        }"
       >
         {{ orderButtonText }}
       </button>
     </div>
-    <div v-else class="flex h-full items-center">
+    <div v-else-if="!orderId" class="flex h-full items-center">
       <InfoBlock
         image-url="/package-icon.png"
         title="Корзина пуста"
         description="Добавьте хотя бы одну пару кроссовок, чтобы сделать заказ."
       />
     </div>
+
+    <div v-else class="flex h-full items-center">
+      <InfoBlock
+        image-url="/order-success-icon.png"
+        title="Заказ оформлен!"
+        :description="`Ваш заказ №${orderId} скоро будет передан курьерской доставке.`"
+      />
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed } from "vue"
+import { computed, inject, ref, type Ref } from "vue"
+import axios from "axios"
 import DrawerHead from "@/components/DrawerHead.vue"
 import CartItemList from "@/components/CartItemList.vue"
 import InfoBlock from "@/components/InfoBlock.vue"
+import type { IFullSneaker } from "@/types/sneaker"
+
+const { cart } = inject("cart") as {
+  cart: Ref<IFullSneaker[]>
+  removeFromCart: Function
+}
 
 const props = defineProps<{
   totalPrice: number
-  isOrderLoading: boolean
 }>()
 
 const emit = defineEmits({
   closeDrawer: null,
-  createOrder: null,
 })
+
+const isOrderLoading = ref(false)
+const orderId = ref<null | number>(null)
+
+const createOrder = async () => {
+  isOrderLoading.value = true
+  try {
+    const { data } = await axios.post(
+      `https://94b7cd2ddefb8133.mokky.dev/orders`,
+      {
+        items: cart.value,
+        totalPrice: props.totalPrice,
+      }
+    )
+
+    cart.value = []
+
+    orderId.value = data.id
+  } catch (error) {
+    console.log(error)
+  } finally {
+    isOrderLoading.value = false
+  }
+}
 
 const closeDrawer = () => {
   emit("closeDrawer")
-}
-
-const createOrder = () => {
-  emit("createOrder")
 }
 
 const taxSum = computed(() => {
@@ -74,6 +110,6 @@ const taxSum = computed(() => {
 })
 
 const orderButtonText = computed(() => {
-  return props.isOrderLoading ? "Заказ оформляется..." : "Оформить заказ"
+  return isOrderLoading.value ? "Заказ оформляется..." : "Оформить заказ"
 })
 </script>

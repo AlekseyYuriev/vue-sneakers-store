@@ -25,7 +25,7 @@ defineProps<{
   imageUrl: string
   price: number
   isFavorite: boolean
-  isAdded: boolean
+  isAdded?: boolean
 }>()
 
 const emit = defineEmits({
