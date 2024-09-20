@@ -32,22 +32,6 @@ const { scrollbarWidth } = storeToRefs(useScrollbarWidth())
 const cart = ref<IFullSneaker[]>([])
 const isDrawerOpen = ref(false)
 
-const addToCart = (sneakerForCart: IFullSneaker) => {
-  sneakerForCart.isAdded = true
-  cart.value.push(sneakerForCart)
-}
-
-const removeFromCart = (sneakerForCart: IFullSneaker) => {
-  const isSneakerAddedToCart = cart.value.find(
-    (item) => item.id === sneakerForCart.id
-  )
-
-  if (isSneakerAddedToCart) {
-    cart.value.splice(cart.value.indexOf(isSneakerAddedToCart), 1)
-    sneakerForCart.isAdded = false
-  }
-}
-
 const openDrawer = () => {
   isDrawerOpen.value = true
 }
@@ -74,5 +58,5 @@ watch(
   { deep: true }
 )
 
-provide("cart", { cart, removeFromCart, addToCart })
+provide("cart", { cart })
 </script>

@@ -66,7 +66,6 @@ import type { IFullSneaker } from "@/types/sneaker"
 
 const { cart } = inject("cart") as {
   cart: Ref<IFullSneaker[]>
-  removeFromCart: Function
 }
 
 const props = defineProps<{

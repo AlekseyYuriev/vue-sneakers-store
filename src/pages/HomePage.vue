@@ -29,7 +29,7 @@
     :sneakers="sneakers"
     :isLoading="isLoading"
     @handle-favorite="handleFavorite"
-    @handle-cart="handleCart"
+    @handle-cart="updateCart"
     v-auto-animate
   />
 </template>
@@ -39,16 +39,17 @@ import { inject, onMounted, reactive, ref, watch, type Ref } from "vue"
 import axios from "axios"
 import debounce from "lodash.debounce"
 import AppCardList from "@/components/AppCardList.vue"
+import useCart from "@/composables/useCart"
 import type { IFullSneaker, ISneaker } from "@/types/sneaker"
 import type { IFilter } from "@/types/filters"
 import type { IParams } from "@/types/params"
 import type { IFavoriteSneaker } from "@/types/favorites"
 
-const { cart, removeFromCart, addToCart } = inject("cart") as {
+const { cart } = inject("cart") as {
   cart: Ref<IFullSneaker[]>
-  removeFromCart: Function
-  addToCart: Function
 }
+
+const { checkIfSneakerAddedToCart, handleCart } = useCart()
 
 const sneakers = ref<IFullSneaker[]>([])
 const isLoading = ref(false)
@@ -94,10 +95,8 @@ const handleFavorite = async (id: number) => {
   }
 }
 
-const handleCart = (sneakerForCart: IFullSneaker) => {
-  sneakerForCart.isAdded
-    ? removeFromCart(sneakerForCart)
-    : addToCart(sneakerForCart)
+const updateCart = (sneakerForCart: IFullSneaker) => {
+  handleCart(sneakerForCart, cart)
 }
 
 const fetchFavorites = async () => {
@@ -147,6 +146,8 @@ const fetchItems = async () => {
       isAdded: false,
       favoriteId: null,
     }))
+
+    checkIfSneakerAddedToCart(sneakers, cart)
   } catch (error) {
     console.log(error)
   }
@@ -163,13 +164,6 @@ onMounted(async () => {
 
   await fetchItems()
   await fetchFavorites()
-
-  sneakers.value.forEach(
-    (sneaker) =>
-      (sneaker.isAdded = cart.value.some(
-        (cartItem: IFullSneaker) => cartItem.id === sneaker.id
-      ))
-  )
 })
 
 watch(
@@ -187,9 +181,13 @@ watch(
   }
 )
 
-watch(cart, () => {
-  sneakers.value.forEach((sneaker) => {
-    sneaker.isAdded = false
-  })
-})
+watch(
+  cart,
+  () => {
+    checkIfSneakerAddedToCart(sneakers, cart)
+  },
+  {
+    deep: true,
+  }
+)
 </script>

@@ -9,7 +9,7 @@
       :price="item.price"
       :is-added="item.isAdded"
       :is-favorite="item.isFavorite"
-      @remove-from-cart="removeFromCart(item)"
+      @remove-from-cart="deleteItemFromCart(item)"
     />
   </div>
 </template>
@@ -18,10 +18,16 @@
 import { inject, type Ref } from "vue"
 import CartItem from "@/components/CartItem.vue"
 import type { IFullSneaker } from "@/types/sneaker"
+import useCart from "@/composables/useCart"
 
-const { cart, removeFromCart } = inject("cart") as {
+const { cart } = inject("cart") as {
   cart: Ref<IFullSneaker[]>
-  removeFromCart: Function
+}
+
+const { removeFromCart } = useCart()
+
+const deleteItemFromCart = (item: IFullSneaker) => {
+  removeFromCart(item, cart)
 }
 </script>
 
