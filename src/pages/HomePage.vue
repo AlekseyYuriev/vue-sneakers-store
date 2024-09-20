@@ -37,6 +37,7 @@
 <script setup lang="ts">
 import { inject, onMounted, reactive, ref, watch, type Ref } from "vue"
 import axios from "axios"
+import debounce from "lodash.debounce"
 import AppCardList from "@/components/AppCardList.vue"
 import type { IFullSneaker, ISneaker } from "@/types/sneaker"
 import type { IFilter } from "@/types/filters"
@@ -132,6 +133,7 @@ const fetchItems = async () => {
     if (filters.searchQuery) {
       params.title = `*${filters.searchQuery}*`
     }
+
     const { data } = await axios.get(
       "https://94b7cd2ddefb8133.mokky.dev/items",
       {
@@ -150,6 +152,11 @@ const fetchItems = async () => {
   }
 }
 
+const debouncedFetchItemsAndFavorites = debounce(async () => {
+  await fetchItems()
+  await fetchFavorites()
+}, 700)
+
 onMounted(async () => {
   const savedCart = localStorage.getItem("cart")
   cart.value = savedCart ? JSON.parse(savedCart) : []
@@ -165,10 +172,20 @@ onMounted(async () => {
   )
 })
 
-watch(filters, async () => {
-  await fetchItems()
-  await fetchFavorites()
-})
+watch(
+  () => filters.sortBy,
+  async () => {
+    await fetchItems()
+    await fetchFavorites()
+  }
+)
+
+watch(
+  () => filters.searchQuery,
+  () => {
+    debouncedFetchItemsAndFavorites()
+  }
+)
 
 watch(cart, () => {
   sneakers.value.forEach((sneaker) => {
