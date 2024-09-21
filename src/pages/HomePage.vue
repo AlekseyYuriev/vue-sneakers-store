@@ -38,11 +38,11 @@
 import { inject, onMounted, reactive, ref, watch, type Ref } from "vue"
 import axios from "axios"
 import debounce from "lodash.debounce"
+import { getAllSneakers } from "@/services/sneakers"
 import AppCardList from "@/components/AppCardList.vue"
 import useCart from "@/composables/useCart"
-import type { IFullSneaker, ISneaker } from "@/types/sneaker"
+import type { IFullSneaker } from "@/types/sneaker"
 import type { IFilter } from "@/types/filters"
-import type { IParams } from "@/types/params"
 import type { IFavoriteSneaker } from "@/types/favorites"
 
 const { cart } = inject("cart") as {
@@ -123,38 +123,9 @@ const fetchFavorites = async () => {
   }
 }
 
-const fetchItems = async () => {
-  try {
-    const params: IParams = {
-      sortBy: filters.sortBy,
-    }
-
-    if (filters.searchQuery) {
-      params.title = `*${filters.searchQuery}*`
-    }
-
-    const { data } = await axios.get(
-      "https://94b7cd2ddefb8133.mokky.dev/items",
-      {
-        params,
-      }
-    )
-
-    sneakers.value = data.map((item: ISneaker) => ({
-      ...item,
-      isFavorite: false,
-      isAdded: false,
-      favoriteId: null,
-    }))
-
-    checkIfSneakerAddedToCart(sneakers, cart)
-  } catch (error) {
-    console.log(error)
-  }
-}
-
-const debouncedFetchItemsAndFavorites = debounce(async () => {
-  await fetchItems()
+const debouncedGetAllSneakersAndFavorites = debounce(async () => {
+  sneakers.value = await getAllSneakers(filters)
+  checkIfSneakerAddedToCart(sneakers, cart)
   await fetchFavorites()
 }, 700)
 
@@ -162,14 +133,16 @@ onMounted(async () => {
   const savedCart = localStorage.getItem("cart")
   cart.value = savedCart ? JSON.parse(savedCart) : []
 
-  await fetchItems()
+  sneakers.value = await getAllSneakers(filters)
+  checkIfSneakerAddedToCart(sneakers, cart)
   await fetchFavorites()
 })
 
 watch(
   () => filters.sortBy,
   async () => {
-    await fetchItems()
+    sneakers.value = await getAllSneakers(filters)
+    checkIfSneakerAddedToCart(sneakers, cart)
     await fetchFavorites()
   }
 )
@@ -177,7 +150,7 @@ watch(
 watch(
   () => filters.searchQuery,
   () => {
-    debouncedFetchItemsAndFavorites()
+    debouncedGetAllSneakersAndFavorites()
   }
 )
 
