@@ -36,13 +36,13 @@
 
 <script setup lang="ts">
 import { inject, onMounted, ref, type Ref } from "vue"
-import AppCardList from "@/components/AppCardList.vue"
-import type { IFullSneaker } from "@/types/sneaker"
-import type { IFavoriteSneakerServerData } from "@/types/favorites"
 import {
   deleteSneakerFromFavorites,
   getAllFavoriteSneakers,
 } from "@/services/sneakers"
+import AppCardList from "@/components/AppCardList.vue"
+import type { IFullSneaker } from "@/types/sneaker"
+import type { IFavoriteSneakerServerData } from "@/types/favorites"
 
 const { cart } = inject("cart") as {
   cart: Ref<IFullSneaker[]>

@@ -54,5 +54,3 @@ const handleCart = () => {
   emit("handleCart")
 }
 </script>
-
-<style scoped></style>

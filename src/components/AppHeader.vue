@@ -50,5 +50,3 @@ const openDrawer = () => {
   emit("openDrawer")
 }
 </script>
-
-<style scoped></style>

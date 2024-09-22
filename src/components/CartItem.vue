@@ -36,5 +36,3 @@ const removeFromCart = () => {
   emit("removeFromCart")
 }
 </script>
-
-<style scoped></style>

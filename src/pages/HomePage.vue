@@ -47,7 +47,7 @@ import AppCardList from "@/components/AppCardList.vue"
 import useCart from "@/composables/useCart"
 import type { IFullSneaker } from "@/types/sneaker"
 import type { IFilter } from "@/types/filters"
-import type { IFavoriteSneaker, itemIdObj } from "@/types/favorites"
+import type { favoriteSneakerItemId, itemIdObj } from "@/types/favorites"
 
 const { cart } = inject("cart") as {
   cart: Ref<IFullSneaker[]>
@@ -81,7 +81,9 @@ const handleFavorite = async (id: number) => {
       item_id: id,
     }
 
-    const objSavedToFavorites = await addSneakerToFavorites(itemIdObj)
+    const objSavedToFavorites = (await addSneakerToFavorites(
+      itemIdObj
+    )) as favoriteSneakerItemId
 
     likedSneaker.favoriteId = objSavedToFavorites.id
     likedSneaker.isFavorite = true
@@ -95,11 +97,12 @@ const updateCart = (sneakerForCart: IFullSneaker) => {
 }
 
 const checkIfSneakerAddedToFavorites = async () => {
-  const favoriteSneakedrs = await getFavoriteSneakersItemId()
+  const favoriteSneakers =
+    (await getFavoriteSneakersItemId()) as favoriteSneakerItemId[]
 
   sneakers.value = sneakers.value.map((item: IFullSneaker) => {
-    const favorite = favoriteSneakedrs.find(
-      (favorite: IFavoriteSneaker) => favorite.item_id === item.id
+    const favorite = favoriteSneakers.find(
+      (favorite: favoriteSneakerItemId) => favorite.item_id === item.id
     )
 
     if (!favorite) {
@@ -113,7 +116,7 @@ const checkIfSneakerAddedToFavorites = async () => {
 }
 
 const debouncedGetAllSneakersAndCheckFavorites = debounce(async () => {
-  sneakers.value = await getAllSneakers(filters)
+  sneakers.value = (await getAllSneakers(filters)) as IFullSneaker[]
   checkIfSneakerAddedToCart(sneakers, cart)
   await checkIfSneakerAddedToFavorites()
 }, 700)
@@ -122,7 +125,7 @@ onMounted(async () => {
   const savedCart = localStorage.getItem("cart")
   cart.value = savedCart ? JSON.parse(savedCart) : []
 
-  sneakers.value = await getAllSneakers(filters)
+  sneakers.value = (await getAllSneakers(filters)) as IFullSneaker[]
   checkIfSneakerAddedToCart(sneakers, cart)
   await checkIfSneakerAddedToFavorites()
 })
@@ -130,7 +133,7 @@ onMounted(async () => {
 watch(
   () => filters.sortBy,
   async () => {
-    sneakers.value = await getAllSneakers(filters)
+    sneakers.value = (await getAllSneakers(filters)) as IFullSneaker[]
     checkIfSneakerAddedToCart(sneakers, cart)
     await checkIfSneakerAddedToFavorites()
   }

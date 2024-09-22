@@ -45,7 +45,7 @@ export const getFavoriteSneakersItemId = async (): Promise<
     const { data: favorites } = await axios.get(
       "https://94b7cd2ddefb8133.mokky.dev/favorites"
     )
-    console.log(favorites)
+
     return favorites
   } catch (error) {
     console.log(error)

@@ -17,8 +17,8 @@
 <script setup lang="ts">
 import { inject, type Ref } from "vue"
 import CartItem from "@/components/CartItem.vue"
-import type { IFullSneaker } from "@/types/sneaker"
 import useCart from "@/composables/useCart"
+import type { IFullSneaker } from "@/types/sneaker"
 
 const { cart } = inject("cart") as {
   cart: Ref<IFullSneaker[]>
@@ -30,5 +30,3 @@ const deleteItemFromCart = (item: IFullSneaker) => {
   removeFromCart(item, cart)
 }
 </script>
-
-<style scoped></style>

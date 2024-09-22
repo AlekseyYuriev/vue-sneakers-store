@@ -9,7 +9,7 @@
   >
     <DrawerHead @close-drawer="closeDrawer" />
 
-    <div v-if="totalPrice > 0" class="flex flex-col flex-1">
+    <div v-if="totalPrice > 0" class="flex flex-col flex-1 overflow-auto">
       <CartItemList />
 
       <div class="flex flex-col gap-4 my-7">
@@ -27,7 +27,7 @@
       </div>
 
       <button
-        @click="createOrder"
+        @click="createNewOrder"
         :disabled="totalPrice <= 0 || isOrderLoading"
         class="transition bg-lime-500 w-full rounded-xl py-3 text-white disabled:bg-slate-300 hover:bg-lime-600 active:bg-lime-700 cursor-pointer"
         :class="{
@@ -58,7 +58,7 @@
 
 <script setup lang="ts">
 import { computed, inject, ref, type Ref } from "vue"
-import axios from "axios"
+import { createOrder } from "@/services/orders"
 import DrawerHead from "@/components/DrawerHead.vue"
 import CartItemList from "@/components/CartItemList.vue"
 import InfoBlock from "@/components/InfoBlock.vue"
@@ -79,25 +79,15 @@ const emit = defineEmits({
 const isOrderLoading = ref(false)
 const orderId = ref<null | number>(null)
 
-const createOrder = async () => {
+const createNewOrder = async () => {
   isOrderLoading.value = true
-  try {
-    const { data } = await axios.post(
-      `https://94b7cd2ddefb8133.mokky.dev/orders`,
-      {
-        items: cart.value,
-        totalPrice: props.totalPrice,
-      }
-    )
 
-    cart.value = []
+  const newOrder = await createOrder(cart.value, props.totalPrice)
 
-    orderId.value = data.id
-  } catch (error) {
-    console.log(error)
-  } finally {
-    isOrderLoading.value = false
-  }
+  cart.value = []
+
+  orderId.value = newOrder.id
+  isOrderLoading.value = false
 }
 
 const closeDrawer = () => {
