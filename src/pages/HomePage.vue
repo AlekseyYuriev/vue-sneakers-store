@@ -36,14 +36,18 @@
 
 <script setup lang="ts">
 import { inject, onMounted, reactive, ref, watch, type Ref } from "vue"
-import axios from "axios"
 import debounce from "lodash.debounce"
-import { getAllSneakers } from "@/services/sneakers"
+import {
+  addSneakerToFavorites,
+  deleteSneakerFromFavorites,
+  getAllSneakers,
+  getFavoriteSneakersItemId,
+} from "@/services/sneakers"
 import AppCardList from "@/components/AppCardList.vue"
 import useCart from "@/composables/useCart"
 import type { IFullSneaker } from "@/types/sneaker"
 import type { IFilter } from "@/types/filters"
-import type { IFavoriteSneaker } from "@/types/favorites"
+import type { IFavoriteSneaker, itemIdObj } from "@/types/favorites"
 
 const { cart } = inject("cart") as {
   cart: Ref<IFullSneaker[]>
@@ -67,66 +71,51 @@ const handleFavorite = async (id: number) => {
 
   if (!likedSneaker) return
 
-  try {
-    if (likedSneaker.isFavorite) {
-      await axios.delete(
-        `https://94b7cd2ddefb8133.mokky.dev/favorites/${likedSneaker.favoriteId}`
-      )
+  if (likedSneaker.isFavorite) {
+    await deleteSneakerFromFavorites(likedSneaker.favoriteId as number)
 
-      likedSneaker.favoriteId = null
-      likedSneaker.isFavorite = false
-    } else {
-      const obj = {
-        item_id: id,
-      }
-
-      const { data } = await axios.post(
-        `https://94b7cd2ddefb8133.mokky.dev/favorites`,
-        obj
-      )
-
-      likedSneaker.favoriteId = data.id
-      likedSneaker.isFavorite = true
+    likedSneaker.favoriteId = null
+    likedSneaker.isFavorite = false
+  } else {
+    const itemIdObj: itemIdObj = {
+      item_id: id,
     }
-  } catch (error) {
-    console.log(error)
-  } finally {
-    isLoading.value = false
+
+    const objSavedToFavorites = await addSneakerToFavorites(itemIdObj)
+
+    likedSneaker.favoriteId = objSavedToFavorites.id
+    likedSneaker.isFavorite = true
   }
+
+  isLoading.value = false
 }
 
 const updateCart = (sneakerForCart: IFullSneaker) => {
   handleCart(sneakerForCart, cart)
 }
 
-const fetchFavorites = async () => {
-  try {
-    const { data: favorites } = await axios.get(
-      "https://94b7cd2ddefb8133.mokky.dev/favorites"
+const checkIfSneakerAddedToFavorites = async () => {
+  const favoriteSneakedrs = await getFavoriteSneakersItemId()
+
+  sneakers.value = sneakers.value.map((item: IFullSneaker) => {
+    const favorite = favoriteSneakedrs.find(
+      (favorite: IFavoriteSneaker) => favorite.item_id === item.id
     )
 
-    sneakers.value = sneakers.value.map((item: IFullSneaker) => {
-      const favorite = favorites.find(
-        (favorite: IFavoriteSneaker) => favorite.item_id === item.id
-      )
-
-      if (!favorite) {
-        return item
-      }
-
-      item.isFavorite = true
-      item.favoriteId = favorite.id
+    if (!favorite) {
       return item
-    })
-  } catch (error) {
-    console.log(error)
-  }
+    }
+
+    item.isFavorite = true
+    item.favoriteId = favorite.id
+    return item
+  })
 }
 
-const debouncedGetAllSneakersAndFavorites = debounce(async () => {
+const debouncedGetAllSneakersAndCheckFavorites = debounce(async () => {
   sneakers.value = await getAllSneakers(filters)
   checkIfSneakerAddedToCart(sneakers, cart)
-  await fetchFavorites()
+  await checkIfSneakerAddedToFavorites()
 }, 700)
 
 onMounted(async () => {
@@ -135,7 +124,7 @@ onMounted(async () => {
 
   sneakers.value = await getAllSneakers(filters)
   checkIfSneakerAddedToCart(sneakers, cart)
-  await fetchFavorites()
+  await checkIfSneakerAddedToFavorites()
 })
 
 watch(
@@ -143,14 +132,14 @@ watch(
   async () => {
     sneakers.value = await getAllSneakers(filters)
     checkIfSneakerAddedToCart(sneakers, cart)
-    await fetchFavorites()
+    await checkIfSneakerAddedToFavorites()
   }
 )
 
 watch(
   () => filters.searchQuery,
   () => {
-    debouncedGetAllSneakersAndFavorites()
+    debouncedGetAllSneakersAndCheckFavorites()
   }
 )
 

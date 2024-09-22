@@ -15,3 +15,12 @@ export interface IFavoriteSneakerServerData {
     imageUrl: string
   }
 }
+
+export interface itemIdObj {
+  item_id: number
+}
+
+export interface favoriteSneakerItemId {
+  item_id: number
+  id: number
+}
