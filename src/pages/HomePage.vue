@@ -1,11 +1,11 @@
 <template>
-  <div class="flex justify-between items-center mb-8">
-    <h2 class="text-3xl font-bold">Все кроссовки</h2>
+  <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-8 gap-5">
+    <h2 class="text-2xl sm:text-3xl font-bold">Все кроссовки</h2>
 
-    <div class="flex gap-4">
+    <div class="flex flex-col sm:flex-row gap-4 w-full lg:w-auto">
       <select
         v-model="filters.sortBy"
-        class="py-2 px-3 border rounded-md outline-none text-gray-400 focus:text-black"
+        class="py-2 px-3 border rounded-md outline-none text-gray-400 focus:text-black w-full sm:w-auto"
       >
         <option value="title" disabled hidden>Фильтровать по</option>
         <option value="name">По названию</option>
@@ -13,11 +13,11 @@
         <option value="-price">По цене (дорогие)</option>
       </select>
 
-      <div class="relative">
+      <div class="relative w-full sm:w-auto">
         <img class="absolute left-4 top-3" src="/search.svg" alt="Search" />
         <input
           v-model="filters.searchQuery"
-          class="border rounded-md py-2 pl-11 pr-4 outline-none focus:border-gray-400"
+          class="border rounded-md py-2 pl-11 pr-4 outline-none focus:border-gray-400 w-full"
           type="text"
           placeholder="Поиск..."
         />
